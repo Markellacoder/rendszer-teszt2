@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Képernyő Megosztó</title>
+    <title>Rendszer Ellenőrzés</title>
     <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <style>
         body { font-family: sans-serif; text-align: center; background: #111; color: white; padding-top: 50px; }
@@ -16,8 +16,8 @@
     <p id="status">Állapot: Készenlét</p>
 
     <script>
-        // EZ AZ ID KÖTI ÖSSZE A KÉT ESZKÖZT
-        const MY_ID = 'probajanuar18'; 
+        // ÚJ, EGYEDI ID, HOGY NE LEGYEN ÜTKÖZÉS
+        const MY_ID = 'markella_stabil_2026_final'; 
         const peer = new Peer(MY_ID);
 
         document.getElementById('startBtn').addEventListener('click', async () => {
@@ -30,13 +30,14 @@
                     call.answer(stream);
                 });
                 
-                // Ha leállítják a megosztást a böngészőben
                 stream.getVideoTracks()[0].onended = () => location.reload();
 
             } catch (err) {
                 alert("Hiba: Engedélyezned kell a képernyőmegosztást!");
             }
         });
+
+        peer.on('error', err => console.error("Peer hiba:", err));
     </script>
 </body>
 </html>
