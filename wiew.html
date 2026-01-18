@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Távoli Monitor</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        video { width: 100vw; height: auto; max-height: 90vh; background: #111; }
+        .controls { padding: 10px; background: #222; width: 100%; text-align: center; color: white; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <button onclick="location.reload()">CSATLAKOZÁS / FRISSÍTÉS</button>
+        <span id="status" style="margin-left: 10px;">Keresés...</span>
+    </div>
+    <video id="remoteVideo" autoplay playsinline title="A távoli kép itt fog megjelenni"></video>
+
+    <script>
+        const videoElem = document.getElementById('remoteVideo');
+        const status = document.getElementById('status');
+        
+        // Itt nem kell ID a Peer-be, ő a hívó fél
+        const peer = new Peer(); 
+        const TARGET_ID = 'markella_titkos_2026'; 
+
+        peer.on('open', () => {
+            status.innerText = "Csatlakozás a PC-hez...";
+            
+            // Üres streamet küldünk, hogy megkapjuk a PC képét
+            const call = peer.call(TARGET_ID, new MediaStream());
+            
+            call.on('stream', remoteStream => {
+                videoElem.srcObject = remoteStream;
+                status.innerText = "ÉLŐ ADÁS";
+            });
+        });
+
+        peer.on('error', err => {
+            console.error(err);
+            status.innerText = "Hiba: A PC nem elérhető.";
+        });
+    </script>
+</body>
+</html>
