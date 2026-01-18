@@ -14,34 +14,42 @@
 </head>
 <body>
     <div class="controls">
-        <button onclick="location.reload()">CSATLAKOZÁS / FRISSÍTÉS</button>
-        <span id="status" style="margin-left: 10px;">Keresés...</span>
+        <button onclick="location.reload()">ÚJRACSATLAKOZÁS</button>
+        <span id="status" style="margin-left: 10px;">Csatlakozás...</span>
     </div>
-    <video id="remoteVideo" autoplay playsinline title="A távoli kép itt fog megjelenni"></video>
+    <video id="remoteVideo" autoplay playsinline></video>
 
     <script>
         const videoElem = document.getElementById('remoteVideo');
         const status = document.getElementById('status');
         
-        // Itt nem kell ID a Peer-be, ő a hívó fél
         const peer = new Peer(); 
-        const TARGET_ID = 'probajanuar18'; 
+        const TARGET_ID = 'markella_stabil_2026_final'; 
 
         peer.on('open', () => {
-            status.innerText = "Csatlakozás a PC-hez...";
+            status.innerText = "Szerver OK, keresem a PC-t...";
             
-            // Üres streamet küldünk, hogy megkapjuk a PC képét
-            const call = peer.call(TARGET_ID, new MediaStream());
-            
-            call.on('stream', remoteStream => {
-                videoElem.srcObject = remoteStream;
-                status.innerText = "ÉLŐ ADÁS";
-            });
+            // 2 másodpercet várunk, hogy a szerver biztosan regisztráljon minket
+            setTimeout(() => {
+                const call = peer.call(TARGET_ID, new MediaStream());
+                
+                call.on('stream', remoteStream => {
+                    videoElem.srcObject = remoteStream;
+                    status.innerText = "ÉLŐ ADÁS";
+                });
+
+                // Ha 5 mp után sincs kép, kiírjuk a tippet
+                setTimeout(() => {
+                    if (status.innerText !== "ÉLŐ ADÁS") {
+                        status.innerText = "Nincs válasz a PC-től. Indítsd el a START-ot a PC-n!";
+                    }
+                }, 5000);
+            }, 2000);
         });
 
         peer.on('error', err => {
+            status.innerText = "Kapcsolati hiba történt.";
             console.error(err);
-            status.innerText = "Hiba: A PC nem elérhető.";
         });
     </script>
 </body>
